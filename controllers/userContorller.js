@@ -2,17 +2,18 @@ const User = require('../models/User');
 
 // Create new user
 const createUser = async (req, res) => {
-    const { name, age, surname } = req.body;
-    console.log(name,age,surname)
-    if (!name || !age || !surname) {
+    const { name, password } = req.body;
+    
+    if (!name || !password) {
         return res.status(400).json({ message: 'Bad Request: Missing data' });
     }
 
     try {
-        const newUser = new User({ name, age, surname });
+        const newUser = new User({ name, password });
         await newUser.save();
-        res.json({ data: newUser });
+        res.status(201).json({ data: newUser });
     } catch (err) {
+        console.error(err); // Xatoni konsolga chiqarish
         res.status(500).json({ message: 'Server Error' });
     }
 };
@@ -23,6 +24,7 @@ const getUsers = async (req, res) => {
         const users = await User.find();
         res.json({ data: users });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ message: 'Server Error' });
     }
 };
@@ -34,18 +36,19 @@ const getUserById = async (req, res) => {
         if (!user) return res.status(404).json({ message: 'User not found' });
         res.json({ data: user });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ message: 'Server Error' });
     }
 };
 
 // Update user by ID
 const updateUser = async (req, res) => {
-    const { name, age, surname } = req.body;
+    const { password } = req.body; // faqat passwordni olish
 
     try {
         const user = await User.findByIdAndUpdate(
             req.params.id,
-            { name, age, surname },
+            { password }, // faqat passwordni yangilash
             { new: true, runValidators: true }
         );
 
@@ -53,6 +56,7 @@ const updateUser = async (req, res) => {
 
         res.json({ data: user });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ message: 'Server Error' });
     }
 };
@@ -66,6 +70,7 @@ const deleteUser = async (req, res) => {
 
         res.json({ message: 'User deleted successfully' });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ message: 'Server Error' });
     }
 };

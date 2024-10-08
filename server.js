@@ -1,29 +1,24 @@
 const express = require('express');
-const dotenv = require('dotenv');
-const connectDB = require('./config/database'); // MongoDB ulanishi uchun faylni import qilish
-const UserRouter = require('./routes/users')
 const cors = require('cors');
+const connectDB = require('./config/database');
+const calculateRoutes = require('./routes/calculate');
+const userRoutes = require('./routes/users');
+require('dotenv').config();
 
-// .env faylini yuklash
-dotenv.config();
+const app = express(); 
 
-// MongoDB ga ulanish
-connectDB();
+connectDB(); 
 
-const app = express();
-app.use(cors())
+// Middleware
+app.use(cors());
+app.use(express.json()); 
 
-// Middleware to parse JSON data
-app.use(express.json());
-
-// Route example
-app.get('/', (req, res) => {
-  res.send('Server is running');
-});
-app.use('/user', UserRouter)
-const PORT = process.env.PORT || 5001;
+// Route
+app.use('/calculate', calculateRoutes);
+app.use('/users', userRoutes);
 
 // Serverni ishga tushirish
+const PORT = process.env.PORT || 5001; 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`Your API is running on port ${PORT}`);
 });
